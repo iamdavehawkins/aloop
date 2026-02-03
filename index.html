@@ -402,6 +402,175 @@
             color: var(--color-secondary);
         }
         
+        /* Lyrics Display */
+        .lyrics-player {
+            display: none;
+            padding: 12px 20px;
+            text-align: center;
+            border-top: 1px solid rgba(79, 106, 137, 0.2);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .lyrics-player.active {
+            display: block;
+        }
+        
+        .lyrics-scroll {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .lyric-line {
+            font-family: 'Degular Text', Georgia, serif;
+            transition: all 0.3s ease-out;
+            max-width: 100%;
+            line-height: 1.3;
+            padding: 0 10px;
+        }
+        
+        .lyric-intro {
+            font-family: 'Vulf Mono', 'Courier New', monospace;
+            font-size: 0.7em;
+            font-style: italic;
+            color: var(--color-secondary);
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+        }
+        
+        .lyric-line.prev {
+            font-size: 0.8em;
+            color: var(--color-secondary);
+            opacity: 0.5;
+        }
+        
+        .lyric-line.current {
+            font-size: 1em;
+            color: var(--color-accent);
+            opacity: 1;
+        }
+        
+        .lyric-line.next {
+            font-size: 0.8em;
+            color: var(--color-secondary);
+            opacity: 0.5;
+        }
+        
+        .lyric-line.hidden {
+            opacity: 0;
+            height: 0;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Credits Link */
+        .credits-link {
+            font-family: 'Vulf Mono', 'Courier New', monospace;
+            font-size: 0.7em;
+            font-style: italic;
+            color: var(--color-secondary);
+            text-decoration: none;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: all 0.2s ease;
+            background: none;
+            border: none;
+            padding: 0;
+            margin-left: 10px;
+        }
+        
+        .credits-link:hover {
+            color: var(--color-accent);
+            opacity: 1;
+        }
+        
+        /* Credits Modal */
+        .credits-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .credits-modal.active {
+            display: flex;
+        }
+        
+        .credits-modal-content {
+            background: var(--color-charcoal);
+            border: 1px solid var(--color-secondary);
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            position: relative;
+        }
+        
+        .credits-modal-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: var(--color-secondary);
+            font-size: 1.5em;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            transition: color 0.2s ease;
+        }
+        
+        .credits-modal-close:hover {
+            color: var(--color-accent);
+        }
+        
+        .credits-modal h3 {
+            font-family: 'Compadre Extended', Georgia, serif;
+            font-size: 1.3em;
+            color: var(--color-paper);
+            margin: 0 0 16px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .credits-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .credits-list li {
+            font-family: 'Degular Text', Georgia, serif;
+            font-size: 0.95em;
+            color: var(--color-paper);
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(79, 106, 137, 0.2);
+        }
+        
+        .credits-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .credits-role {
+            font-family: 'Vulf Mono', 'Courier New', monospace;
+            font-size: 0.8em;
+            font-style: italic;
+            color: var(--color-secondary);
+            display: block;
+            margin-bottom: 2px;
+        }
+        
+        .credits-name {
+            color: var(--color-accent);
+        }
+        
         @media (prefers-reduced-motion: reduce) {
             .audio-player::before {
                 animation: none;
@@ -649,6 +818,7 @@
                     <div class="track-artist">Dave Hawkins</div>
                 </div>
                 <div class="track-duration" id="trackDuration">4:38</div>
+                <button class="credits-link" id="creditsLink">credits</button>
             </div>
             <div class="player-progress" id="playerProgress">
                 <div class="progress-container" id="progressContainer">
@@ -657,6 +827,13 @@
                 <div class="time-display">
                     <span id="currentTime">0:00</span>
                     <span id="totalTime">4:38</span>
+                </div>
+            </div>
+            <div class="lyrics-player" id="lyricsPlayer">
+                <div class="lyrics-scroll" id="lyricsScroll">
+                    <div class="lyric-line prev" id="lyricPrev"></div>
+                    <div class="lyric-line current" id="lyricCurrent"></div>
+                    <div class="lyric-line next" id="lyricNext"></div>
                 </div>
             </div>
         </div>
@@ -783,6 +960,20 @@
         <p>&copy; <script>document.write(new Date().getFullYear());</script> Dave Hawkins | <a href="https://links.iamdavehawkins.com">iamdavehawkins.com</a></p>
     </footer>
 
+    <!-- Credits Modal -->
+    <div class="credits-modal" id="creditsModal">
+        <div class="credits-modal-content">
+            <button class="credits-modal-close" id="creditsModalClose" aria-label="Close">&times;</button>
+            <h3>A Loop</h3>
+            <ul class="credits-list">
+                <li><span class="credits-role">Mixed by</span><span class="credits-name">Sean Kenney, Dad Mode Audio</span></li>
+                <li><span class="credits-role">Mastered by</span><span class="credits-name">Kevin Embleton</span></li>
+                <li><span class="credits-role">Drums</span><span class="credits-name">AJ Capuano / Doe Denim</span></li>
+                <li><span class="credits-role">Additional Keys</span><span class="credits-name">Brandon Lucas Green / Kid Lightbulbs</span></li>
+            </ul>
+        </div>
+    </div>
+
     <script>
         const audio = document.getElementById('audio');
         const playBtn = document.getElementById('playBtn');
@@ -791,11 +982,111 @@
         const progressContainer = document.getElementById('progressContainer');
         const currentTimeEl = document.getElementById('currentTime');
         const totalTimeEl = document.getElementById('totalTime');
+        const lyricsPlayer = document.getElementById('lyricsPlayer');
+        const lyricPrev = document.getElementById('lyricPrev');
+        const lyricCurrent = document.getElementById('lyricCurrent');
+        const lyricNext = document.getElementById('lyricNext');
+        
+        const songTitle = "A Loop";
+        const artistName = "Dave Hawkins";
+        
+        const lyricsData = [
+            { time: 21.83, text: "I'm going through my pockets, i think i lost something" },
+            { time: 27.84, text: "I don't know when i dropped it, where do we begin" },
+            { time: 33.83, text: "The small things fall softly, and you don't feel them go" },
+            { time: 39.92, text: "But you're gonna hear it, the quiet always grows" },
+            { time: 45.79, text: "Caught in a loop, all day, always" },
+            { time: 51.71, text: "Caught in a loop, no light, no way" },
+            { time: 57.73, text: "Caught in a loop, all day, always" },
+            { time: 63.77, text: "Caught in a loop, we play, the game" },
+            { time: 82.55, text: "The wheel keeps on spinning, but the thread pulls thin" },
+            { time: 88.72, text: "Tradin what we're given, for the place we're in" },
+            { time: 94.53, text: "The season keeps on changin, but the hours don't bend" },
+            { time: 100.69, text: "And everything we're handed, expected to expend" },
+            { time: 106.50, text: "Caught in a loop, all day, always" },
+            { time: 112.41, text: "Caught in a loop, no light, no way" },
+            { time: 118.54, text: "Caught in a loop, all day, always" },
+            { time: 124.47, text: "Caught in a loop, we play, the game" },
+            { time: 130.57, text: "Take a deep breath, this is such a good life" },
+            { time: 133.10, text: "Show some gratitude everything is just fine" },
+            { time: 136.33, text: "Discomfort means progress, embrace the unknown" },
+            { time: 139.38, text: "The hustle is holy this pain is your own" },
+            { time: 142.38, text: "Optimize effort, not just your hours" },
+            { time: 145.46, text: "Every setback contains hidden powers" },
+            { time: 148.43, text: "Growth begins when excuses end" },
+            { time: 150.83, text: "You have the same 24 hours as them, friend" },
+            { time: 154.44, text: "Trust in the process, results will appear" },
+            { time: 157.27, text: "Your dreams are just metrics you haven't made clear" },
+            { time: 160.25, text: "We're all in this together, remember your why" },
+            { time: 163.29, text: "Align with the vision, and keep reaching high" },
+            { time: 166.38, text: "No need for rest when you're living your purpose" },
+            { time: 169.23, text: "Success is a service, and you are in service" },
+            { time: 172.36, text: "Your effort is valued, your future is fated" },
+            { time: 175.00, text: "I will love you forever, not a minute wasted" },
+            { time: 178.57, text: "I will love you forever, not a minute wasted" },
+            { time: 190.48, text: "I will love you forever, not a minute wasted" },
+            { time: 202.42, text: "I will love you forever, not a minute wasted" },
+            { time: 214.38, text: "I will love you forever, not a minute wasted" },
+            { time: 226.41, text: "I will love you forever, not a minute wasted" },
+            { time: 238.46, text: "I will love you forever, not a minute wasted" },
+            { time: 250.64, text: "I will love you forever, not a minute wasted" },
+            { time: 262.55, text: "I will love you forever, not a minute wasted" }
+        ];
+        
+        let currentLyricIndex = -1;
         
         function formatTime(seconds) {
             const mins = Math.floor(seconds / 60);
             const secs = Math.floor(seconds % 60);
             return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        function getCurrentLyricIndex(time) {
+            for (let i = lyricsData.length - 1; i >= 0; i--) {
+                if (time >= lyricsData[i].time) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+        
+        function updateLyrics(time) {
+            const newIndex = getCurrentLyricIndex(time);
+            
+            if (newIndex !== currentLyricIndex) {
+                currentLyricIndex = newIndex;
+                
+                if (currentLyricIndex > 0) {
+                    lyricPrev.textContent = lyricsData[currentLyricIndex - 1].text;
+                    lyricPrev.classList.remove('hidden', 'lyric-intro');
+                } else if (currentLyricIndex === 0) {
+                    lyricPrev.textContent = `${songTitle} — ${artistName} — Lyrics`;
+                    lyricPrev.classList.remove('hidden');
+                    lyricPrev.classList.add('lyric-intro');
+                } else {
+                    lyricPrev.textContent = '';
+                    lyricPrev.classList.add('hidden');
+                }
+                
+                if (currentLyricIndex >= 0) {
+                    lyricCurrent.textContent = lyricsData[currentLyricIndex].text;
+                    lyricCurrent.classList.remove('lyric-intro');
+                } else {
+                    lyricCurrent.textContent = `${songTitle} — ${artistName} — Lyrics`;
+                    lyricCurrent.classList.add('lyric-intro');
+                }
+                
+                if (currentLyricIndex < lyricsData.length - 1 && currentLyricIndex >= 0) {
+                    lyricNext.textContent = lyricsData[currentLyricIndex + 1].text;
+                    lyricNext.classList.remove('hidden');
+                } else if (currentLyricIndex === -1 && lyricsData.length > 0) {
+                    lyricNext.textContent = lyricsData[0].text;
+                    lyricNext.classList.remove('hidden');
+                } else {
+                    lyricNext.textContent = '';
+                    lyricNext.classList.add('hidden');
+                }
+            }
         }
         
         function updateProgress() {
@@ -804,6 +1095,7 @@
                 progressBar.style.width = percent + '%';
                 currentTimeEl.textContent = formatTime(audio.currentTime);
                 totalTimeEl.textContent = formatTime(audio.duration);
+                updateLyrics(audio.currentTime);
             }
         }
         
@@ -812,6 +1104,9 @@
                 audio.play();
                 playBtn.classList.add('playing');
                 playerProgress.classList.add('active');
+                lyricsPlayer.classList.add('active');
+                currentLyricIndex = -2; // Reset to force update
+                updateLyrics(audio.currentTime);
             } else {
                 audio.pause();
                 playBtn.classList.remove('playing');
@@ -835,8 +1130,29 @@
         audio.addEventListener('ended', () => {
             playBtn.classList.remove('playing');
             playerProgress.classList.remove('active');
+            lyricsPlayer.classList.remove('active');
             progressBar.style.width = '0%';
             currentTimeEl.textContent = '0:00';
+            currentLyricIndex = -1;
+        });
+        
+        // Credits Modal
+        const creditsLink = document.getElementById('creditsLink');
+        const creditsModal = document.getElementById('creditsModal');
+        const creditsModalClose = document.getElementById('creditsModalClose');
+        
+        creditsLink.addEventListener('click', () => {
+            creditsModal.classList.add('active');
+        });
+        
+        creditsModalClose.addEventListener('click', () => {
+            creditsModal.classList.remove('active');
+        });
+        
+        creditsModal.addEventListener('click', (e) => {
+            if (e.target === creditsModal) {
+                creditsModal.classList.remove('active');
+            }
         });
     </script>
 </body>
